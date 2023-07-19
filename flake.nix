@@ -5,7 +5,7 @@
 
     devShells.x86_64-linux.default = pkgs.mkShell {
       packages = with pkgs; [
-        (python3.withPackages (ps: with ps; [ torch configargparse pyyaml torchvision opencv4
+        (python3.withPackages (ps: with ps; [ torch configargparse pyyaml torchvision opencv4 onnx
             (
               buildPythonPackage rec {
                 pname = "piqa";

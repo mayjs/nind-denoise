@@ -192,6 +192,7 @@ if __name__ == '__main__':
     parser.add_argument('--whole_image', action='store_true', help='Ignore cs and ucs, denoise whole image')
     parser.add_argument('--pad', type=int, help='Padding amt per side, only used for whole image (otherwise (cs-ucs)/2')
     parser.add_argument('--models_dpath', help='Directory where all models are saved (used when a model name is provided as model_path)')
+    parser.add_argument('--dump_onnx', help='Path to dump the model as ONNX')
     
     args, _ = parser.parse_known_args()
     assert args.model_path is not None
@@ -233,6 +234,13 @@ if __name__ == '__main__':
     topil = torchvision.transforms.ToPILImage()
     fswidth, fsheight = Image.open(args.input).size
     newimg = torch.zeros(3, fsheight, fswidth, dtype=torch.float32)
+
+    if args.dump_onnx is not None:
+        x = ds[0][0][None, :]
+        print("Input shape:", x.size())
+        torch.onnx.export(model, x, args.dump_onnx,export_params=True, opset_version=11, do_constant_folding=True, input_names=["input"], output_names = ["output"], dynamic_axes= {"input": {0: "batch_size"}, "output": {0: "batch_size"}})
+        print(f"Exported model to '{args.dump_onnx}'. Quitting.")
+        sys.exit(0)
 
     start_time = time.time()
     for n_count, ydat in enumerate(DLoader):
