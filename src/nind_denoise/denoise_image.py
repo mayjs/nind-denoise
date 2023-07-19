@@ -242,7 +242,8 @@ if __name__ == '__main__':
             sys.exit(f'denoise_image.py: {ybatch.shape=}, {math.prod(ybatch.shape)=} > {args.max_subpixels=} for {args.input=}; aborting')
         ybatch = ybatch.to(device)
         xbatch = model(ybatch)
-        torch.cuda.synchronize()
+        if args.cuda_device >= 0:
+            torch.cuda.synchronize()
         for i in range(ybatch.size(0)):
             ud = usefuldims[i]
             # pytorch represents images as [channels, height, width]
